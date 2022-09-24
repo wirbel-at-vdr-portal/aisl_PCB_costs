@@ -8,5 +8,6 @@ A tiny calculator for PCBs to be produced at aisler.net.
 ***Use this tool at Your Own Risk.***
 
 If you find more precise estimations, based on formulas and it's references, you may create an issue.
+Similarly, this code might be compiled on Linux as well, without trouble. If you need, just create an issue.
 
 --wirbel

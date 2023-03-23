@@ -5,7 +5,8 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ExtCtrls,
+  Math;
 
 type
 
@@ -51,6 +52,8 @@ type
   public
 
   end;
+
+function EstimateArrival(BusinessDays:Integer):TDate;
 
 var
   Form1: TForm1;
@@ -111,6 +114,7 @@ var w,h,sqcm:double;
     days,shipping:Integer;
     fs:TFormatSettings;
     sum,tmp,stencil:double;
+    arrival:TDate;
 begin
   fs:=FormatSettings;
   fs.DecimalSeparator:='.';
@@ -155,39 +159,78 @@ begin
   { beauty 2-layer}
   sum := tmp;
   sum += Beauti_Budget2L_JobFee + sqcm*Beauti_Budget2L_sqcm * n;
+  arrival := EstimateArrival(days + Beauti_Budget2L_PCB);
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
-  Label_Beauti_Budget2L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_Budget2L_PCB) + ' working days)';
+  Label_Beauti_Budget2L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_Budget2L_PCB) + ' working days: ' + DateToStr(arrival) + ')';
 
   { beauty 2-layer express}
   sum := tmp;
   sum += Beauti_Blitz2L_JobFee + sqcm*Beauti_Blitz2L_sqcm * n;
+  arrival := EstimateArrival(days + Beauti_Blitz2L_PCB);
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
-  Label_Beauti_Blitz2L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_Blitz2L_PCB) + ' working days)';
+  Label_Beauti_Blitz2L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_Blitz2L_PCB) + ' working days: ' + DateToStr(arrival) + ')';
 
   { beauty HD 2-layer}
   sum := tmp;
   sum += Beauti_HD2L_JobFee + sqcm*Beauti_HD2L_sqcm * n;
+  arrival := EstimateArrival(days + Beauti_HD2L_PCB);
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
-  Label_Beauti_HD2L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_HD2L_PCB) + ' working days)';
+  Label_Beauti_HD2L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_HD2L_PCB) + ' working days: ' + DateToStr(arrival) + ')';
 
   { beauty HD 4-layer}
   sum := tmp;
   sum += Beauti_HD4L_JobFee + sqcm*Beauti_HD4L_sqcm * n;
+  arrival := EstimateArrival(days + Beauti_HD4L_PCB);
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
-  Label_Beauti_HD4L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_HD4L_PCB) + ' working days)';
+  Label_Beauti_HD4L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_HD4L_PCB) + ' working days: ' + DateToStr(arrival) + ')';
 
   { beauty HD 6-layer}
   sum := tmp;
   sum += Beauti_HD6L_JobFee + sqcm*Beauti_HD6L_sqcm * n;
+  arrival := EstimateArrival(days + Beauti_HD6L_PCB);
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
-  Label_Beauti_HD6L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_HD6L_PCB) + ' working days)';
+  Label_Beauti_HD6L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_HD6L_PCB) + ' working days: ' + DateToStr(arrival) + ')';
 
+  EstimateArrival(13);
 end;
+
+function DayOfTheWeek(Day:TDate):Integer;
+begin
+  { DayOfWeek returns the day of the week from DateTime.
+    Sunday is counted as day 1, Saturday is counted as day 7. }
+  Result := DayOfWeek(Day) - 1;
+  if Result = 0 then
+     Result := 7;
+end;
+
+function EstimateArrival(BusinessDays:Integer):TDate;
+var
+  NextDay:TDate;
+begin
+  NextDay := ceil(now()); { tomorrow 0:00 }
+
+  { skip weekends for begin }
+  if DayOfTheWeek(NextDay) = 6 then {Saturday, next is Monday.}
+     NextDay += 2.0
+  else if DayOfTheWeek(NextDay) = 7 then {Sunday, next is Monday.}
+     NextDay += 1.0;
+
+  while(BusinessDays > 0) do
+     begin
+     NextDay += 1.0;
+     if DayOfTheWeek(NextDay) > 5 then
+        continue;
+     dec(BusinessDays);
+     end;
+
+  Result := NextDay;
+end;
+
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
@@ -200,8 +243,6 @@ begin
   memo1.lines.add('Beautiful Blitz  2L   : width:0.20,  spacing:0.15  drill=0.3, milling:2.4, slots:n');
   memo1.lines.add('Beautiful HD  2L/4L/6L: width:0.125, spacing:0.125 drill=0.2, milling:1.6, slots:y');
   memo1.ReadOnly:=true;
-
-
 end;
 
 end.

@@ -12,7 +12,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="24"/>
       </Unit0>
       <Unit1>
         <Filename Value="unit1.pas"/>
@@ -22,22 +22,21 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="72"/>
-        <CursorPos X="53" Y="115"/>
-        <UsageCount Value="22"/>
+        <TopLine Value="119"/>
+        <CursorPos X="182" Y="131"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="..\LTspice_ModelEditor\tools.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="24"/>
         <CursorPos X="28" Y="68"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit2>
     </Units>
-    <JumpHistory Count="15" HistoryIndex="14">
+    <JumpHistory Count="20" HistoryIndex="19">
       <Position1>
         <Filename Value="unit1.pas"/>
       </Position1>
@@ -97,6 +96,26 @@
         <Filename Value="unit1.pas"/>
         <Caret Line="105" Column="47" TopLine="50"/>
       </Position15>
+      <Position16>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="93" Column="25" TopLine="77"/>
+      </Position16>
+      <Position17>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="161" Column="42" TopLine="121"/>
+      </Position17>
+      <Position18>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="156" Column="133" TopLine="123"/>
+      </Position18>
+      <Position19>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="88" Column="14" TopLine="59"/>
+      </Position19>
+      <Position20>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="87" Column="14" TopLine="87"/>
+      </Position20>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

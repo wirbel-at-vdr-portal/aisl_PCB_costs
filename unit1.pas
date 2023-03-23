@@ -13,6 +13,7 @@ type
 
   TForm1 = class(TForm)
     Button1: TButton;
+    CheckBox_StencilDoubleSided: TCheckBox;
     CheckBox_VAT: TCheckBox;
     Edit_Count: TEdit;
     Edit_width: TEdit;
@@ -38,7 +39,11 @@ type
     RadioBtn_INT_Post: TRadioButton;
     RadioBtn_INT_UPS: TRadioButton;
     RadioBtn_INT_UPS_express: TRadioButton;
+    RadioBtn_NoStencil: TRadioButton;
+    RadioBtn_Stencil: TRadioButton;
+    RadioBtn_StencilRapid: TRadioButton;
     RadioGroup1: TRadioGroup;
+    RadioGroup2: TRadioGroup;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -74,6 +79,9 @@ const
    Shipping_UPS_costs:double         = 17.85;
    Shipping_UPS_express_costs:double = 23.80;
 
+   Stellar_Stencil_JobFee:double     = 5.0;
+   Stellar_Stencil_sqcm:double       = 0.095;
+   Stellar_Stencil_rapid:double      = 8.40;  { 10.00 / (1.0 + VAT_DE) }
 
    {multiple number of PCBs}
    Beauti_multiple:Integer       = 3;
@@ -98,17 +106,18 @@ const
 
 
 procedure TForm1.Button1Click(Sender: TObject);
-var w,h:double;
+var w,h,sqcm:double;
     n:integer;
     days,shipping:Integer;
     fs:TFormatSettings;
-    sum,tmp:double;
+    sum,tmp,stencil:double;
 begin
   fs:=FormatSettings;
   fs.DecimalSeparator:='.';
 
   w:=StrToFloat(StringReplace(Edit_width.Text , ',','.',[rfReplaceAll]),fs);
   h:=StrToFloat(StringReplace(Edit_height.Text, ',','.',[rfReplaceAll]),fs);
+  sqcm :=  (w*h)*0.01;
 
   n:=StrToInt  (StringReplace(Edit_count.Text , ',','.',[rfReplaceAll]));
   while(n mod Beauti_multiple) <> 0 do
@@ -131,37 +140,49 @@ begin
   else if RadioBtn_INT_UPS_express.Checked then   tmp := Shipping_UPS_express_costs
   else                                            tmp:=0; { default: free shipping. }
 
+  { stencil }
+  if RadioBtn_Stencil.Checked or RadioBtn_StencilRapid.Checked then
+     begin
+     stencil := Stellar_Stencil_JobFee + sqcm*Stellar_Stencil_sqcm;
+     if CheckBox_StencilDoubleSided.Checked then
+        stencil *= 2.0;
+     if RadioBtn_StencilRapid.Checked then
+        stencil += Stellar_Stencil_rapid;
+     tmp += stencil;
+     end;
+
+
   { beauty 2-layer}
   sum := tmp;
-  sum += Beauti_Budget2L_JobFee + (w*h)*0.01*Beauti_Budget2L_sqcm * n;
+  sum += Beauti_Budget2L_JobFee + sqcm*Beauti_Budget2L_sqcm * n;
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
   Label_Beauti_Budget2L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_Budget2L_PCB) + ' working days)';
 
   { beauty 2-layer express}
   sum := tmp;
-  sum += Beauti_Blitz2L_JobFee + (w*h)*0.01*Beauti_Blitz2L_sqcm * n;
+  sum += Beauti_Blitz2L_JobFee + sqcm*Beauti_Blitz2L_sqcm * n;
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
   Label_Beauti_Blitz2L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_Blitz2L_PCB) + ' working days)';
 
   { beauty HD 2-layer}
   sum := tmp;
-  sum += Beauti_HD2L_JobFee + (w*h)*0.01*Beauti_HD2L_sqcm * n;
+  sum += Beauti_HD2L_JobFee + sqcm*Beauti_HD2L_sqcm * n;
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
   Label_Beauti_HD2L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_HD2L_PCB) + ' working days)';
 
   { beauty HD 4-layer}
   sum := tmp;
-  sum += Beauti_HD4L_JobFee     + (w*h)*0.01*Beauti_HD4L_sqcm * n;
+  sum += Beauti_HD4L_JobFee + sqcm*Beauti_HD4L_sqcm * n;
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
   Label_Beauti_HD4L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_HD4L_PCB) + ' working days)';
 
   { beauty HD 6-layer}
   sum := tmp;
-  sum += Beauti_HD6L_JobFee     + (w*h)*0.01*Beauti_HD6L_sqcm * n;
+  sum += Beauti_HD6L_JobFee + sqcm*Beauti_HD6L_sqcm * n;
   if CheckBox_VAT.checked then
      sum *= (1.0 + VAT_DE);
   Label_Beauti_HD6L.Caption := FloatToStrF(sum,ffFixed,10,2) + '€ (' + IntToStr(n) + ' boards, ' + IntToStr(days + Beauti_HD6L_PCB) + ' working days)';

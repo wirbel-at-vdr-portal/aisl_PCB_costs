@@ -32,10 +32,12 @@ type
     Label8: TLabel;
     Label_Beauti_HD4L: TLabel;
     Memo1: TMemo;
-    RadioButton1: TRadioButton;
-    RadioButton2: TRadioButton;
-    RadioButton3: TRadioButton;
-    RadioButton4: TRadioButton;
+    RadioBtn_DE_Post: TRadioButton;
+    RadioBtn_DE_UPS: TRadioButton;
+    RadioBtn_DE_UPS_express: TRadioButton;
+    RadioBtn_INT_Post: TRadioButton;
+    RadioBtn_INT_UPS: TRadioButton;
+    RadioBtn_INT_UPS_express: TRadioButton;
     RadioGroup1: TRadioGroup;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -85,12 +87,14 @@ const
    Beauti_Blitz2L_PCB:Integer       = 2;
    Beauti_HD2L_PCB:Integer          = 5;
    Beauti_HD4L_PCB:Integer          = 7;
-   Beauti_HD6L_PCB:Integer          = 7;
+   Beauti_HD6L_PCB:Integer          = 10;
    General_Dispatch:Integer         = 1;
    Shipping_Regular_DE:Integer      = 2;
-   Shipping_Regular_DE_UPS:Integer  = 1;
+   Shipping_Regular_DE_UPS:Integer  = 2;
+   Shipping_Express_DE_UPS:Integer  = 1;
    Shipping_Regular_Int:Integer     = 20;
-   Shipping_Regular_Int_UPS:Integer = 3;
+   Shipping_Regular_Int_UPS:Integer = 20; { undefined, as per country. }
+   Shipping_Express_Int_UPS:Integer = 3;
 
 
 procedure TForm1.Button1Click(Sender: TObject);
@@ -111,16 +115,21 @@ begin
      inc(n);
 
   { shipping time }
-  if RadioButton2.Checked then        shipping := Shipping_Regular_DE_UPS
-  else if RadioButton3.Checked then   shipping := Shipping_Regular_Int
-  else if RadioButton4.Checked then   shipping := Shipping_Regular_Int_UPS
-  else                                shipping := Shipping_Regular_DE;
+       if RadioBtn_DE_Post.Checked then           shipping := Shipping_Regular_DE
+  else if RadioBtn_DE_UPS.Checked then            shipping := Shipping_Regular_DE_UPS
+  else if RadioBtn_DE_UPS_express.Checked then    shipping := Shipping_Express_DE_UPS
+  else if RadioBtn_INT_Post.Checked then          shipping := Shipping_Regular_Int
+  else if RadioBtn_INT_UPS.Checked then           shipping := Shipping_Regular_Int_UPS
+  else if RadioBtn_INT_UPS_express.Checked then   shipping := Shipping_Express_Int_UPS
+  else                                            shipping := Shipping_Regular_DE;
   days := General_Dispatch + shipping;
 
   { shipping costs }
-  if RadioButton2.Checked then        tmp := Shipping_UPS_costs
-  else if RadioButton4.Checked then   tmp := Shipping_UPS_express_costs
-  else                                tmp:=0; { default: free shipping. }
+       if RadioBtn_DE_UPS.Checked then            tmp := Shipping_UPS_costs
+  else if RadioBtn_INT_UPS.Checked then           tmp := Shipping_UPS_costs
+  else if RadioBtn_DE_UPS_express.Checked then    tmp := Shipping_UPS_express_costs
+  else if RadioBtn_INT_UPS_express.Checked then   tmp := Shipping_UPS_express_costs
+  else                                            tmp:=0; { default: free shipping. }
 
   { beauty 2-layer}
   sum := tmp;

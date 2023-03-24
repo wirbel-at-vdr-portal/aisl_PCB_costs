@@ -54,6 +54,8 @@ type
   end;
 
 function EstimateArrival(BusinessDays:Integer):TDate;
+function EasterSunday(Year4digit:word):TDate;
+function IsGermanHolyday(date:TDate):boolean;
 
 var
   Form1: TForm1;
@@ -61,6 +63,8 @@ var
 implementation
 
 {$R *.lfm}
+uses DateUtils;
+
 
 const
    {prices in euro (excl VAT),
@@ -142,7 +146,7 @@ begin
   else if RadioBtn_INT_UPS.Checked then           tmp := Shipping_UPS_costs
   else if RadioBtn_DE_UPS_express.Checked then    tmp := Shipping_UPS_express_costs
   else if RadioBtn_INT_UPS_express.Checked then   tmp := Shipping_UPS_express_costs
-  else                                            tmp:=0; { default: free shipping. }
+  else                                            tmp := 0; { default: free shipping. }
 
   { stencil }
   if RadioBtn_Stencil.Checked or RadioBtn_StencilRapid.Checked then
@@ -225,6 +229,8 @@ begin
      NextDay += 1.0;
      if DayOfTheWeek(NextDay) > 5 then
         continue;
+     if IsGermanHolyday(NextDay) then
+        continue;
      dec(BusinessDays);
      end;
 
@@ -243,6 +249,97 @@ begin
   memo1.lines.add('Beautiful Blitz  2L   : width:0.20,  spacing:0.15  drill=0.3, milling:2.4, slots:n');
   memo1.lines.add('Beautiful HD  2L/4L/6L: width:0.125, spacing:0.125 drill=0.2, milling:1.6, slots:y');
   memo1.ReadOnly:=true;
+end;
+
+
+
+{ algo: Carl Friedrich Gauß }
+function EasterSunday(Year4digit:word):TDate;
+var
+  a,b,c,d,e,offset:Integer;
+  NewYear:TDate;
+begin
+  a := Year4digit mod 19;
+  b := Year4digit mod 4;
+  c := Year4digit mod 7;
+  d := (a * 19 + 24) mod 30;
+  e := (b * 2 + c * 4 + d * 6 + 5) mod 7;
+  offset := 22 + d + e;
+  NewYear := EncodeDate(Year4digit,1,1);
+  EasterSunday := NewYear + offset;
+end;
+
+function IsGermanHolyday(date:TDate):boolean;
+var
+  year,month,day:word;
+
+  Neujahr,
+  Maifeiertag,
+  TagDerDeutschenEinheit,
+  Allerheiligen,
+  ErsterWeihnachtstag,
+  ZweiterWeihnachtstag,
+  OsterSonntag,
+  Rosenmontag,
+  Fastnachtsdienstag,
+  Karfreitag,
+  Ostermontag,
+  Himmelfahrt,
+  Pfingstsonntag,
+  Pfingstmontag,
+  Fronleichnam :TDate;
+begin
+  Result := true;
+  DecodeDate(date,year,month,day);
+
+  Neujahr := EncodeDate(year,1,1); { 1.January }
+  if IsSameDay(date, Neujahr) then exit;
+
+  Maifeiertag := EncodeDate(year,5,1); { 1.May }
+  if IsSameDay(date, Maifeiertag) then exit;
+
+  TagDerDeutschenEinheit := EncodeDate(year,10,3); { 3.October }
+  if IsSameDay(date, TagDerDeutschenEinheit) then exit;
+
+  Allerheiligen := EncodeDate(year,11,1); { 1.November }
+  if IsSameDay(date, Allerheiligen) then exit;
+
+  ErsterWeihnachtstag := EncodeDate(year,12,25); { 25.December }
+  if IsSameDay(date, ErsterWeihnachtstag) then exit;
+
+  ZweiterWeihnachtstag := EncodeDate(year,12,26); { 26.December }
+  if IsSameDay(date, ZweiterWeihnachtstag) then exit;
+
+  { OsterSonntag = first sunday after first full moon after
+    beginning of spring (21. March) }
+  OsterSonntag := EasterSunday(year);
+  if IsSameDay(date, OsterSonntag) then exit;
+
+  Rosenmontag := OsterSonntag - 48.0; { 48 days before easter sunday }
+  if IsSameDay(date, Rosenmontag) then exit;
+
+  Fastnachtsdienstag  := OsterSonntag - 47.0; { 47 days before easter sunday }
+  if IsSameDay(date, Fastnachtsdienstag) then exit;
+
+  Karfreitag := OsterSonntag -  2.0; { 2 days before easter sunday }
+  if IsSameDay(date, Karfreitag) then exit;
+
+  Ostermontag := OsterSonntag +  1.0; { 1 day after easter sunday }
+  if IsSameDay(date, Ostermontag) then exit;
+
+  Himmelfahrt := OsterSonntag + 39.0; { 39 days after easter sunday }
+  if IsSameDay(date, Himmelfahrt) then exit;
+
+  Pfingstsonntag := OsterSonntag + 49.0; { 49 days after easter sunday }
+  if IsSameDay(date, Pfingstsonntag) then exit;
+
+  Pfingstmontag := OsterSonntag + 50.0; { 50 days after easter sunday }
+  if IsSameDay(date, Pfingstmontag) then exit;
+
+  Fronleichnam := OsterSonntag + 60.0; { 60 days after easter sunday }
+  if IsSameDay(date, Fronleichnam) then exit;
+
+  Result := false;
 end;
 
 end.

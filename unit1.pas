@@ -240,14 +240,21 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  memo1.lines.add('This tool *estimates* prices and shipping time, acc. to the informations');
-  memo1.lines.add('on the aisler.net webpage. Use at this tool at Your Own Risk.');
+  memo1.lines.add('This tool *estimates* prices and shipping time, acc. to the informations on the aisler.net webpage.');
+  memo1.lines.add('It may or may not calculate as expected and is intended to give an rough overview of ordering or');
+  memo1.lines.add('design possibilities. It is my private tool and just shared with others.');
+  memo1.lines.add('Use at this tool at Your Own Risk. If you find more precise estimations, based on formulas and');
+  memo1.lines.add('its references, you may create an github issue. Similarly, this code might be compiled on Linux');
+  memo1.lines.add('as well. Project page is https://github.com/wirbel-at-vdr-portal/aisl_PCB_costs');
+  memo1.lines.add('--wirbel');
   memo1.lines.add('');
-  memo1.lines.Add('Selecting shipping other that default may cause extra costs.');
+  memo1.lines.add('');
+  memo1.lines.Add('Selecting shipping other than default may cause extra costs.');
   memo1.lines.add('');
   memo1.lines.add('Beautiful Budget 2L   : width:0.20,  spacing:0.15  drill=0.3, milling:2.4, slots:n');
   memo1.lines.add('Beautiful Blitz  2L   : width:0.20,  spacing:0.15  drill=0.3, milling:2.4, slots:n');
   memo1.lines.add('Beautiful HD  2L/4L/6L: width:0.125, spacing:0.125 drill=0.2, milling:1.6, slots:y');
+  memo1.lines.add('');
   memo1.ReadOnly:=true;
 end;
 
